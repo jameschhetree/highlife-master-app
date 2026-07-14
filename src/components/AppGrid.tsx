@@ -21,6 +21,23 @@ function extractDomain(url: string): string {
   }
 }
 
+const PREVIEW_MAP: Record<string, string> = {
+  "highlife-roadmap.vercel.app": "/previews/roadmap.jpg",
+  "highlife-finance.vercel.app": "/previews/finances.jpg",
+  "highlife-crm.vercel.app": "/previews/prospect-crm.jpg",
+  "highlife-live.vercel.app": "/previews/live.jpg",
+  "highlife-interns.vercel.app": "/previews/interns.jpg",
+  "highlifedashboard.com": "/previews/dashboard.jpg",
+  "highlife-inbound-crm.vercel.app": "/previews/inbound-crm.jpg",
+  "highlife-calculator.vercel.app": "/previews/calculator.jpg",
+  "highlife-playlists.vercel.app": "/previews/playlists.jpg",
+};
+
+function getPreview(url: string): string | null {
+  const domain = extractDomain(url);
+  return PREVIEW_MAP[domain] || null;
+}
+
 export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
   const [apps, setApps] = useState<AppItem[]>(initialApps);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -204,7 +221,16 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
                   <span className="chrome-url">{domain}</span>
                 </div>
                 <div className="preview-body">
-                  <span className="preview-glyph">{app.glyph}</span>
+                  {getPreview(app.url) ? (
+                    <img
+                      src={getPreview(app.url)!}
+                      alt={app.title}
+                      className="preview-img"
+                      draggable={false}
+                    />
+                  ) : (
+                    <span className="preview-glyph">{app.glyph}</span>
+                  )}
                 </div>
               </div>
 
@@ -362,12 +388,23 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
         }
         .preview-body {
           position: relative;
-          height: 100px;
+          height: 140px;
           display: flex;
           align-items: center;
           justify-content: center;
           background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.005) 100%);
           overflow: hidden;
+        }
+        .preview-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: top left;
+          opacity: 0.85;
+          transition: opacity 0.3s ease;
+        }
+        .app-card:hover .preview-img {
+          opacity: 1;
         }
         .preview-glyph {
           font-size: 56px;
@@ -435,7 +472,7 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
 
         @media (max-width: 640px) {
           .preview-body {
-            height: 80px;
+            height: 120px;
           }
           .preview-glyph {
             font-size: 48px;
