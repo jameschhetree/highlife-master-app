@@ -24,10 +24,12 @@
     "tsx": "^4.22.3"
   },
   "devDependencies": {
+    "@tailwindcss/oxide-darwin-arm64": "^4.3.0",
     "@tailwindcss/postcss": "4.3.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "lightningcss-darwin-arm64": "^1.32.0",
     "tailwindcss": "4.3.0",
     "typescript": "^5"
   },

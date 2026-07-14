@@ -11,7 +11,6 @@ export default async function Home() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center px-6 py-10">
-      {/* Ambient drifting gradient orbs */}
       <div className="orb orb-1" />
       <div className="orb orb-2" />
       <div className="orb orb-3" />
@@ -24,24 +23,24 @@ export default async function Home() {
             className="w-16 h-16 rounded-2xl object-contain mx-auto mb-5"
           />
           <h1
-            className="text-4xl font-extrabold tracking-tight text-[#1a1a1a]"
+            className="text-4xl font-extrabold tracking-tight text-white"
             style={{ letterSpacing: "-1px" }}
           >
             HighLife DMV
           </h1>
-          <p className="text-sm text-[#999] font-normal mt-2 tracking-wide">
+          <p className="text-sm text-[#666] font-normal mt-2 tracking-wide">
             Podcast Studio &amp; Creative Agency
           </p>
         </header>
 
         <AppGrid initialApps={apps} />
 
-        <footer className="text-center mt-14 pt-6 border-t border-[rgba(0,0,0,0.06)] animate-footer">
-          <p className="text-xs text-[#bbb] tracking-wide">
+        <footer className="text-center mt-14 pt-6 border-t border-[rgba(255,255,255,0.06)] animate-footer">
+          <p className="text-xs text-[#555] tracking-wide">
             Cleveland Park, DC &middot;{" "}
             <a
               href="https://www.highlifedmv.com"
-              className="text-[#8B7355] font-semibold no-underline hover:underline"
+              className="text-[#888] font-semibold no-underline hover:underline hover:text-white transition-colors"
             >
               highlifedmv.com
             </a>
@@ -55,22 +54,22 @@ export default async function Home() {
           border-radius: 50%;
           pointer-events: none;
           z-index: 0;
-          filter: blur(80px);
+          filter: blur(100px);
           will-change: transform;
         }
         .orb-1 {
           width: 600px; height: 600px; top: -15%; right: -10%;
-          background: radial-gradient(circle, rgba(139,115,85,.09) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%);
           animation: drift1 22s ease-in-out infinite alternate;
         }
         .orb-2 {
           width: 500px; height: 500px; bottom: -12%; left: -8%;
-          background: radial-gradient(circle, rgba(26,26,26,.04) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(255,255,255,.03) 0%, transparent 70%);
           animation: drift2 26s ease-in-out infinite alternate;
         }
         .orb-3 {
           width: 400px; height: 400px; top: 40%; left: 50%;
-          background: radial-gradient(circle, rgba(139,115,85,.05) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(255,255,255,.03) 0%, transparent 70%);
           animation: drift3 30s ease-in-out infinite alternate;
         }
         @keyframes drift1 { 0% { transform: translate(0,0) } 100% { transform: translate(-60px,40px) } }
