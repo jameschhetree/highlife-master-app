@@ -15,8 +15,8 @@ export default async function Home() {
       <div className="orb orb-2" />
       <div className="orb orb-3" />
 
-      <div className="relative z-10 w-full max-w-[900px]">
-        <header className="text-center mb-14 animate-header">
+      <div className="relative z-10 w-full max-w-[1180px]">
+        <header className="text-center mb-12 animate-header">
           <img
             src="/logo.webp"
             alt="HighLife"

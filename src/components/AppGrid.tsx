@@ -10,8 +10,17 @@ interface AppItem {
   url: string;
   glyph: string;
   colorVariant: string;
+  category: string;
   sortOrder: number;
 }
+
+/**
+ * Sections, in the order the business actually reads: what we run on, what
+ * happens in the room, what brings work in, what it earns, what we put out.
+ * Anything with an unrecognised category falls to the end under "Other" rather
+ * than disappearing.
+ */
+const SECTIONS = ["Operations", "Studio", "Sales", "Money", "Content"] as const;
 
 function extractDomain(url: string): string {
   try {
@@ -31,6 +40,7 @@ const PREVIEW_MAP: Record<string, string> = {
   "highlife-inbound-crm.vercel.app": "/previews/inbound-crm.jpg",
   "highlife-calculator.vercel.app": "/previews/calculator.jpg",
   "highlife-playlists.vercel.app": "/previews/playlists.jpg",
+  "highlife-sessions.vercel.app": "/previews/sessions.jpg",
 };
 
 function getPreview(url: string): string | null {
@@ -100,7 +110,12 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
 
       const updated = [...apps];
       const [moved] = updated.splice(dragIdx, 1);
-      updated.splice(dropIdx, 0, moved);
+      // Dropping onto a card in another section moves the app into that
+      // section. Without this the card would snap back to where it started,
+      // which reads as the drag having failed.
+      const target = apps[dropIdx];
+      const movedCategory = target ? target.category : moved.category;
+      updated.splice(dropIdx, 0, { ...moved, category: movedCategory });
 
       const reordered = updated.map((app, i) => ({
         ...app,
@@ -108,6 +123,14 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
       }));
       setApps(reordered);
       setDragOverIdx(null);
+
+      if (movedCategory !== moved.category) {
+        await fetch(`/api/apps/${moved.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category: movedCategory }),
+        });
+      }
 
       await fetch("/api/apps/reorder", {
         method: "POST",
@@ -147,12 +170,46 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
     []
   );
 
+  // Group for display, but keep every card's index into the flat `apps` array,
+  // because that is what drag-and-drop reorders against.
+  const groups = [...SECTIONS, "Other"]
+    .map((section) => ({
+      section,
+      items: apps
+        .map((app, idx) => ({ app, idx }))
+        .filter(({ app }) =>
+          section === "Other"
+            ? !(SECTIONS as readonly string[]).includes(app.category)
+            : app.category === section
+        ),
+    }))
+    .filter((g) => g.items.length > 0);
+
+  let rendered = -1;
+
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {apps.map((app, idx) => {
+      <div className="space-y-12">
+        {groups.map((group) => (
+          <section key={group.section}>
+            <div className="flex items-baseline gap-3 mb-4">
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#888]">
+                {group.section}
+              </h2>
+              <span className="text-[11px] text-[#444] tabular-nums">
+                {group.items.length}
+              </span>
+              <span className="flex-1 h-px bg-[rgba(255,255,255,0.07)]" />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {group.items.map(({ app, idx }) => {
           const isOver = dragOverIdx === idx && dragIdx !== idx;
           const domain = extractDomain(app.url);
+          // Stagger runs across the whole page, not per section, so the cards
+          // cascade in one continuous motion instead of restarting each group.
+          rendered += 1;
+          const order = rendered;
 
           return (
             <div
@@ -169,7 +226,7 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
               className="app-card group"
               style={{
                 opacity: 0,
-                animation: `fadeSlideUp 0.6s cubic-bezier(.25,.1,.25,1) ${0.2 + idx * 0.05}s forwards`,
+                animation: `fadeSlideUp 0.6s cubic-bezier(.25,.1,.25,1) ${0.2 + order * 0.04}s forwards`,
                 transform: isOver ? "scale(1.02)" : undefined,
                 borderColor: isOver
                   ? "rgba(255,255,255,.2)"
@@ -296,7 +353,10 @@ export function AppGrid({ initialApps }: { initialApps: AppItem[] }) {
               </div>
             </div>
           );
-        })}
+              })}
+            </div>
+          </section>
+        ))}
       </div>
 
       {/* Add button */}

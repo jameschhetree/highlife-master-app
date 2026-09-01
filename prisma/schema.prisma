@@ -13,6 +13,7 @@ model App {
   url          String
   glyph        String
   colorVariant String   @default("custom")
+  category     String   @default("Operations")
   sortOrder    Int      @default(0)
 
   createdAt DateTime @default(now())
