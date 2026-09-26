@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "HighLife DMV",
   description: "Podcast Studio & Creative Agency",
+  appleWebApp: { title: "HighLife" },
 };
 
 export default function RootLayout({
